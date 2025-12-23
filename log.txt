@@ -1,0 +1,75 @@
+2025-12-23 21:40:01 192.168.1.1:24 SUCCESS
+
+help
+   KM                       ,ok0KNWW    
+         KM               :NMMMMMMMM    
+       KM  ..             WMMMMMMMMM    
+   KM      KM             WMMMMMMMMM    
+   KM    KM               WMMMMMMMMM    
+   KM  KM  ..             WMMMMMMMMM    
+   KM  ..  KM             WMMMMMMMMM    
+   KM  KM  KM             WMMMMMMMMM    
+   KMNXWM  KM             WMMMMMMMMK    
+   KMMMMMKONM             WMMMMMMMW     
+   KMMMMMMMMM             WMMMMMMM x    
+   lMMMMMMMMM             WMMMMMN xK    
+    MMMMMMMMMl           ,WMMMP dXM:    
+    lMMMMMMMMx .        ,,,aaadXMMd     
+     lNMMMMMMW: XOxolcclodOKMMMMWc      
+       lXMMMMMNc lMMMMMMMMMMMMNo.       
+         llONMMM0c lMMMMMMNOo'          
+              'lMN;. lMWl'              
+
+
+BusyBox v1.24.2 (2021-08-18 19:26:48 EEST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+XW.v6.3.6# help
+Built-in commands:
+------------------
+        . : [ [[ alias bg break cd chdir command continue echo eval exec
+        exit export false fg getopts hash help history jobs kill let
+        local printf pwd read readonly return set shift source test times
+        trap true type ulimit umask unalias unset wait
+
+XW.v6.3.6# exit
+
+
+2025-12-23 21:40:02 192.168.0.1:23 SUCCESS
+
+   KM                       ,ok0KNWW    
+         KM               :NMMMMMMMM    
+       KM  ..             WMMMMMMMMM    
+   KM      KM             WMMMMMMMMM    
+   KM    KM               WMMMMMMMMM    
+   KM  KM  ..             WMMMMMMMMM    
+   KM  ..  KM             WMMMMMMMMM    
+   KM  KM  KM             WMMMMMMMMM    
+   KMNXWM  KM             WMMMMMMMMK    
+   KMMMMMKONM             WMMMMMMMW     
+   KMMMMMMMMM             WMMMMMMM x    
+   lMMMMMMMMM             WMMMMMN xK    
+    MMMMMMMMMl           ,WMMMP dXM:    
+    lMMMMMMMMx .        ,,,aaadXMMd     
+     lNMMMMMMW: XOxolcclodOKMMMMWc      
+       lXMMMMMNc lMMMMMMMMMMMMNo.       
+         llONMMM0c lMMMMMMNOo'          
+              'lMN;. lMWl'              
+
+
+BusyBox v1.24.2 (2021-08-18 19:26:48 EEST) built-in shell (ash)
+Enter 'help' for a list of built-in commands.
+
+XW.v6.3.6# help
+Built-in commands:
+------------------
+        . : [ [[ alias bg break cd chdir command continue echo eval exec
+        exit export false fg getopts hash help history jobs kill let
+        local printf pwd read readonly return set shift source test times
+        trap true type ulimit umask unalias unset wait
+
+XW.v6.3.6# exit
+
+
+2025-12-23 21:40:02 192.168.1.1:25 FAIL [Errno 61] Connection refused
+

@@ -21,6 +21,10 @@ with open('commands.txt') as f:
 
 log_file = open('log.txt', 'a')
 
+# --- Лічильники ---
+success_count = 0
+fail_count = 0
+
 for entry in raw_switches:
     try:
         # --- Парсимо IP і порт ---
@@ -53,11 +57,20 @@ for entry in raw_switches:
             f"{time.strftime('%Y-%m-%d %H:%M:%S')} {host}:{port} SUCCESS\n{output}\n\n"
         )
 
+        success_count += 1
+
     except Exception as e:
         print(f"[FAIL] {entry}: {e}")
         log_file.write(
             f"{time.strftime('%Y-%m-%d %H:%M:%S')} {entry} FAIL {e}\n\n"
         )
+        fail_count += 1
 
 log_file.close()
-print("All done.")
+
+# --- Підсумок ---
+print("\n=== Summary ===")
+print(f"Total devices: {len(raw_switches)}")
+print(f"Successful:   {success_count}")
+print(f"Failed:       {fail_count}")
+print("================\nAll done.")
