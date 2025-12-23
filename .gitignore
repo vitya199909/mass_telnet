@@ -1,5 +1,5 @@
 credentials.json
-DS_Store
+.DS_Store
 .vscode/
 __pycache__/
 log.txt
