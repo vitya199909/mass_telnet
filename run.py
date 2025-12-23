@@ -2,46 +2,62 @@ import telnetlib
 import json
 import time
 
-# --- read credentials ---
+DEFAULT_PORT = 23
+
+# --- Креденшіали ---
 with open('credentials.json') as f:
     creds = json.load(f)
+
 USERNAME = creds['username']
 PASSWORD = creds['password']
 
-# --- read switches ---
+# --- Свічі ---
 with open('switches.txt') as f:
-    switches = [line.strip() for line in f if line.strip()]
+    raw_switches = [line.strip() for line in f if line.strip()]
 
-# --- read commands ---
+# --- Команди ---
 with open('commands.txt') as f:
     commands = [line.strip() for line in f if line.strip()]
 
-# --- open log ---
 log_file = open('log.txt', 'a')
 
-# --- main loop ---
-for sw in switches:
+for entry in raw_switches:
     try:
-        print(f"[INFO] Connecting to {sw}...")
-        tn = telnetlib.Telnet(sw, timeout=10)
+        # --- Парсимо IP і порт ---
+        if ':' in entry:
+            host, port = entry.split(':')
+            port = int(port)
+        else:
+            host = entry
+            port = DEFAULT_PORT
+
+        print(f"[INFO] Connecting to {host}:{port}")
+
+        tn = telnetlib.Telnet(host, port, timeout=10)
+
         tn.read_until(b"login: ")
-        tn.write(USERNAME.encode('ascii') + b"\n")
+        tn.write(USERNAME.encode() + b"\n")
+
         tn.read_until(b"Password: ")
-        tn.write(PASSWORD.encode('ascii') + b"\n")
-        
+        tn.write(PASSWORD.encode() + b"\n")
+
         for cmd in commands:
-            tn.write(cmd.encode('ascii') + b"\n")
-            time.sleep(1)  # short pause between commands
-        
+            tn.write(cmd.encode() + b"\n")
+            time.sleep(1)
+
         tn.write(b"exit\n")
-        output = tn.read_all().decode('ascii')
-        
-        print(f"[SUCCESS] {sw}")
-        log_file.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {sw}: SUCCESS\n{output}\n\n")
-        
+        output = tn.read_all().decode(errors='ignore')
+
+        print(f"[SUCCESS] {host}:{port}")
+        log_file.write(
+            f"{time.strftime('%Y-%m-%d %H:%M:%S')} {host}:{port} SUCCESS\n{output}\n\n"
+        )
+
     except Exception as e:
-        print(f"[FAIL] {sw}: {e}")
-        log_file.write(f"{time.strftime('%Y-%m-%d %H:%M:%S')} {sw}: FAIL {e}\n\n")
+        print(f"[FAIL] {entry}: {e}")
+        log_file.write(
+            f"{time.strftime('%Y-%m-%d %H:%M:%S')} {entry} FAIL {e}\n\n"
+        )
 
 log_file.close()
 print("All done.")
