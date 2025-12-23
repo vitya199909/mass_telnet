@@ -26,7 +26,7 @@ logs/                   # Папка з логами
 
 ## ⚙️ Конфігураційний файл `config.json`
 
-```json
+
 {
   "default_port": 23,
   "parallel_connections": 5,
