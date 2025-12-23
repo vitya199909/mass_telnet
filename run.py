@@ -13,7 +13,7 @@ LOG_DIR = "logs"
 
 start_time = time.perf_counter()
 
-# --- Підготовка логів ---
+# --- Prepare logs ---
 os.makedirs(LOG_DIR, exist_ok=True)
 
 log_path = os.path.join(LOG_DIR, "log.txt")
@@ -29,7 +29,7 @@ timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
 success_file.write(f"\n=== SUCCESS LIST ({timestamp}) ===\n")
 fail_file.write(f"\n=== FAIL LIST ({timestamp}) ===\n")
 
-# --- Дані ---
+# --- Data ---
 with open("credentials.json") as f:
     creds = json.load(f)
 
@@ -45,7 +45,7 @@ PASSWORD = creds["password"]
 success_count = 0
 fail_count = 0
 
-# --- Функція підключення ---
+# --- Connection function ---
 def handle_switch(entry):
     try:
         if ":" in entry:
@@ -76,7 +76,7 @@ def handle_switch(entry):
         return ("fail", entry, str(e))
 
 
-# --- Паралельне виконання ---
+# --- Parallel execution ---
 with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
     futures = [executor.submit(handle_switch, sw) for sw in switches]
 
@@ -94,12 +94,12 @@ with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
             log_file.write(f"{timestamp} {target} FAIL {result}\n\n")
             print(f"[FAIL] {target}")
 
-# --- Закриття файлів ---
+# --- Closing files ---
 log_file.close()
 success_file.close()
 fail_file.close()
 
-# --- Час виконання ---
+# --- Execution time ---
 end_time = time.perf_counter()
 elapsed_ms = (end_time - start_time) * 1000
 
