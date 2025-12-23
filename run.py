@@ -4,6 +4,16 @@ import time
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# ---------- COLORS ----------
+class Colors:
+    RESET = '\033[0m'
+    GREEN = '\033[92m'
+    RED = '\033[91m'
+    YELLOW = '\033[93m'
+    BLUE = '\033[94m'
+    CYAN = '\033[96m'
+    BOLD = '\033[1m'
+
 START_TIME = time.perf_counter()
 
 # ---------- CONFIG ----------
@@ -61,7 +71,7 @@ def handle_switch(entry, index, total):
 
     for attempt in range(1, RETRIES + 2):
         try:
-            print(f"[{index}/{total}] {host}:{port} (try {attempt})")
+            print(f"{Colors.CYAN}[{index}/{total}]{Colors.RESET} {Colors.BLUE}{host}:{port}{Colors.RESET} {Colors.YELLOW}(try {attempt}){Colors.RESET}")
 
             tn = telnetlib.Telnet(host, port, timeout=CONNECTION_TIMEOUT)
             tn.read_until(b"login: ", CONNECTION_TIMEOUT)
@@ -80,6 +90,7 @@ def handle_switch(entry, index, total):
             log_file.write(f"{timestamp} {host}:{port} SUCCESS\n{output}\n\n")
             success_file.write(f"{host}:{port}\n")
             success_count += 1
+            print(f"{Colors.GREEN}✓ SUCCESS{Colors.RESET} {host}:{port}")
             return
 
         except Exception as e:
@@ -87,6 +98,7 @@ def handle_switch(entry, index, total):
                 log_file.write(f"{timestamp} {host}:{port} FAIL {e}\n\n")
                 fail_file.write(f"{host}:{port}\n")
                 fail_count += 1
+                print(f"{Colors.RED}✗ FAILED{Colors.RESET} {host}:{port} - {e}")
 
 # ---------- EXECUTION ----------
 with ThreadPoolExecutor(max_workers=PARALLEL) as executor:
@@ -107,8 +119,8 @@ fail_file.close()
 END_TIME = time.perf_counter()
 duration = END_TIME - START_TIME
 
-print("\n=== SUMMARY ===")
-print(f"Total:      {len(switches)}")
-print(f"Success:    {success_count}")
-print(f"Failed:     {fail_count}")
-print(f"Time spent: {duration:.3f} seconds")
+print(f"\n{Colors.BOLD}=== SUMMARY ==={Colors.RESET}")
+print(f"Total:      {Colors.CYAN}{len(switches)}{Colors.RESET}")
+print(f"Success:    {Colors.GREEN}{success_count}{Colors.RESET}")
+print(f"Failed:     {Colors.RED}{fail_count}{Colors.RESET}")
+print(f"Time spent: {Colors.YELLOW}{duration:.3f}{Colors.RESET} seconds")

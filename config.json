@@ -3,5 +3,5 @@
   "connection_timeout": 5,
   "command_delay": 0.5,
   "retries": 2,
-  "parallel_workers": 10
+  "parallel_workers": 1
 }

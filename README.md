@@ -1,0 +1,124 @@
+# Mass Telnet Command Executor
+
+CLI script for mass command execution on switches via Telnet with support for:
+
+- Connecting to multiple ports (`IP` or `IP:PORT`)
+- Parallel command execution with configurable number of threads
+- Connection and command execution timeouts
+- Retry attempts on failed connections
+- Logging to separate `logs/` folder (`log.txt`, `success.txt`, `fail.txt`)
+- Summary at the end with execution time (ms)
+- Progress during execution
+
+---
+
+## 📂 File Structure
+
+```
+run.py                  # Main script
+config.json             # Configuration file
+switches.txt            # List of switches (IP or IP:PORT)
+commands.txt            # Commands to execute
+credentials.json        # Login/password
+logs/                   # Logs folder
+```
+
+---
+
+## ⚙️ Configuration File `config.json`
+
+```json
+{
+  "default_port": 23,
+  "parallel_connections": 5,
+  "connection_timeout": 10,
+  "command_timeout": 5,
+  "max_retries": 2
+}
+```
+
+- `default_port` — default Telnet port
+- `parallel_connections` — number of simultaneous connections
+- `connection_timeout` — switch connection timeout (seconds)
+- `command_timeout` — command execution timeout (seconds)
+- `max_retries` — number of retry attempts on failed connections
+
+---
+
+## 📄 File Formats
+
+**switches.txt**
+
+```
+192.168.1.10
+192.168.1.11:2323
+192.168.1.12:24
+```
+
+**commands.txt**
+
+```
+help
+save
+```
+
+**credentials.json**
+
+```json
+{
+  "username": "admin",
+  "password": "your_pass"
+}
+```
+
+---
+
+## 🖥️ Usage
+
+```bash
+python run.py
+```
+
+- Script automatically creates `logs/` folder and `log.txt`, `success.txt`, `fail.txt` files if they don't exist
+- Shows progress in terminal during execution
+- After completion shows summary:
+- Total number of switches
+- Number of successful and failed connections
+- Execution time (ms)
+
+---
+
+## 📊 Logging
+
+- `logs/log.txt` — detailed logs with date, IP, port, result and command output
+- `logs/success.txt` — list of successful connections with run date
+- `logs/fail.txt` — list of failed connections with run date
+
+---
+
+## 🔹 Features
+
+- Support for IP or IP:PORT
+- Parallel connections with configurable number of threads
+- Connection and command execution timeouts
+- Retry attempts for failed connections
+- Execution progress in terminal
+- Summary with execution time in milliseconds
+- Modular file structure for easy editing: `switches.txt`, `commands.txt`, `credentials.json`
+
+---
+
+## 📌 Recommendations
+
+- Don't commit real credentials to GitHub — use `credentials.example.json`
+- Multiple runs can be added to history, logging preserves previous records
+- For large networks, increase `parallel_connections`, but don't overload switches
+
+---
+
+## ⚡ Provider Use Case Example
+
+- Provider has 1000 switches → one script run replaces hours of manual work
+- After completion, easily review:
+- Failed connections (`fail.txt`)
+- Successful connections (`success.txt`)
