@@ -3,109 +3,112 @@ import json
 import time
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from datetime import datetime
 
-# ================= CONFIG =================
-MAX_WORKERS = 1
-DEFAULT_PORT = 23
-LOG_DIR = "logs"
-# ==========================================
+START_TIME = time.perf_counter()
 
-start_time = time.perf_counter()
+# ---------- CONFIG ----------
+with open("config.json") as f:
+    config = json.load(f)
 
-# --- Prepare logs ---
-os.makedirs(LOG_DIR, exist_ok=True)
+DEFAULT_PORT = config["default_port"]
+CONNECTION_TIMEOUT = config["connection_timeout"]
+COMMAND_DELAY = config["command_delay"]
+RETRIES = config["retries"]
+PARALLEL = config["parallel_workers"]
 
-log_path = os.path.join(LOG_DIR, "log.txt")
-success_path = os.path.join(LOG_DIR, "success.txt")
-fail_path = os.path.join(LOG_DIR, "fail.txt")
+# ---------- FILES ----------
+with open("credentials.json") as f:
+    creds = json.load(f)
+
+USERNAME = creds["username"]
+PASSWORD = creds["password"]
+
+with open("switches.txt") as f:
+    switches = [l.strip() for l in f if l.strip()]
+
+with open("commands.txt") as f:
+    commands = [l.strip() for l in f if l.strip()]
+
+# ---------- LOGS ----------
+os.makedirs("logs", exist_ok=True)
+
+log_path = "logs/log.txt"
+success_path = "logs/success.txt"
+fail_path = "logs/fail.txt"
 
 log_file = open(log_path, "a")
 success_file = open(success_path, "a")
 fail_file = open(fail_path, "a")
 
-timestamp = datetime.now().strftime("%Y-%m-%d %H:%M:%S.%f")[:-3]
+timestamp = time.strftime("%Y-%m-%d %H:%M:%S")
+success_file.write(f"\n=== SUCCESS {timestamp} ===\n")
+fail_file.write(f"\n=== FAIL {timestamp} ===\n")
 
-success_file.write(f"\n=== SUCCESS LIST ({timestamp}) ===\n")
-fail_file.write(f"\n=== FAIL LIST ({timestamp}) ===\n")
-
-# --- Data ---
-with open("credentials.json") as f:
-    creds = json.load(f)
-
-with open("switches.txt") as f:
-    switches = [line.strip() for line in f if line.strip()]
-
-with open("commands.txt") as f:
-    commands = [line.strip() for line in f if line.strip()]
-
-USERNAME = creds["username"]
-PASSWORD = creds["password"]
-
+# ---------- COUNTERS ----------
 success_count = 0
 fail_count = 0
 
-# --- Connection function ---
-def handle_switch(entry):
-    try:
-        if ":" in entry:
-            host, port = entry.split(":")
-            port = int(port)
-        else:
-            host = entry
-            port = DEFAULT_PORT
+# ---------- FUNCTION ----------
+def handle_switch(entry, index, total):
+    global success_count, fail_count
 
-        tn = telnetlib.Telnet(host, port, timeout=10)
+    if ":" in entry:
+        host, port = entry.split(":")
+        port = int(port)
+    else:
+        host = entry
+        port = DEFAULT_PORT
 
-        tn.read_until(b"login: ")
-        tn.write(USERNAME.encode() + b"\n")
+    for attempt in range(1, RETRIES + 2):
+        try:
+            print(f"[{index}/{total}] {host}:{port} (try {attempt})")
 
-        tn.read_until(b"Password: ")
-        tn.write(PASSWORD.encode() + b"\n")
+            tn = telnetlib.Telnet(host, port, timeout=CONNECTION_TIMEOUT)
+            tn.read_until(b"login: ", CONNECTION_TIMEOUT)
+            tn.write(USERNAME.encode() + b"\n")
 
-        for cmd in commands:
-            tn.write(cmd.encode() + b"\n")
-            time.sleep(0.5)
+            tn.read_until(b"Password: ", CONNECTION_TIMEOUT)
+            tn.write(PASSWORD.encode() + b"\n")
 
-        tn.write(b"exit\n")
-        output = tn.read_all().decode(errors="ignore")
+            for cmd in commands:
+                tn.write(cmd.encode() + b"\n")
+                time.sleep(COMMAND_DELAY)
 
-        return ("success", f"{host}:{port}", output)
+            tn.write(b"exit\n")
+            output = tn.read_all().decode(errors="ignore")
 
-    except Exception as e:
-        return ("fail", entry, str(e))
-
-
-# --- Parallel execution ---
-with ThreadPoolExecutor(max_workers=MAX_WORKERS) as executor:
-    futures = [executor.submit(handle_switch, sw) for sw in switches]
-
-    for future in as_completed(futures):
-        status, target, result = future.result()
-
-        if status == "success":
+            log_file.write(f"{timestamp} {host}:{port} SUCCESS\n{output}\n\n")
+            success_file.write(f"{host}:{port}\n")
             success_count += 1
-            success_file.write(f"{target}\n")
-            log_file.write(f"{timestamp} {target} SUCCESS\n{result}\n\n")
-            print(f"[OK]   {target}")
-        else:
-            fail_count += 1
-            fail_file.write(f"{target}\n")
-            log_file.write(f"{timestamp} {target} FAIL {result}\n\n")
-            print(f"[FAIL] {target}")
+            return
 
-# --- Closing files ---
+        except Exception as e:
+            if attempt > RETRIES:
+                log_file.write(f"{timestamp} {host}:{port} FAIL {e}\n\n")
+                fail_file.write(f"{host}:{port}\n")
+                fail_count += 1
+
+# ---------- EXECUTION ----------
+with ThreadPoolExecutor(max_workers=PARALLEL) as executor:
+    futures = []
+    total = len(switches)
+
+    for idx, sw in enumerate(switches, 1):
+        futures.append(executor.submit(handle_switch, sw, idx, total))
+
+    for _ in as_completed(futures):
+        pass
+
+# ---------- FINISH ----------
 log_file.close()
 success_file.close()
 fail_file.close()
 
-# --- Execution time ---
-end_time = time.perf_counter()
-elapsed_ms = (end_time - start_time) * 1000
+END_TIME = time.perf_counter()
+duration = END_TIME - START_TIME
 
-print("\n=== Summary ===")
-print(f"Total devices: {len(switches)}")
-print(f"Successful:   {success_count}")
-print(f"Failed:       {fail_count}")
-print(f"Time spent:   {elapsed_ms:.2f} ms")
-print("================")
+print("\n=== SUMMARY ===")
+print(f"Total:      {len(switches)}")
+print(f"Success:    {success_count}")
+print(f"Failed:     {fail_count}")
+print(f"Time spent: {duration:.3f} seconds")
