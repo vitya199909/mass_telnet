@@ -84,7 +84,7 @@ def handle_switch(entry, index, total):
                 tn.write(cmd.encode() + b"\n")
                 time.sleep(COMMAND_DELAY)
 
-            tn.write(b"exit\n")
+            tn.write(b"logout\n")
             output = tn.read_all().decode(errors="ignore")
 
             log_file.write(f"{timestamp} {host}:{port} SUCCESS\n{output}\n\n")
@@ -124,3 +124,6 @@ print(f"Total:      {Colors.CYAN}{len(switches)}{Colors.RESET}")
 print(f"Success:    {Colors.GREEN}{success_count}{Colors.RESET}")
 print(f"Failed:     {Colors.RED}{fail_count}{Colors.RESET}")
 print(f"Time spent: {Colors.YELLOW}{duration:.3f}{Colors.RESET} seconds")
+
+
+
