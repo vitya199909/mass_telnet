@@ -3,5 +3,6 @@
   "connection_timeout": 10,
   "command_delay": 0.5,
   "retries": 2,
-  "parallel_workers": 5
+  "parallel_workers": 5,
+  "tftp_server": "10.1.11.97"
 }
