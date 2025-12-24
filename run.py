@@ -4,6 +4,11 @@ import time
 import os
 from concurrent.futures import ThreadPoolExecutor, as_completed
 
+# ---------- CONTACTS ----------
+# Viktor Nedilskyi
+# mail: vitya199909@gmail.com
+# telegram: @viktor_nedilskyi
+
 # ---------- COLORS ----------
 class Colors:
     RESET = '\033[0m'
