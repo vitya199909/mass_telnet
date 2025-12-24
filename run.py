@@ -84,7 +84,10 @@ def handle_switch(entry, index, total):
                 tn.write(cmd.encode() + b"\n")
                 time.sleep(COMMAND_DELAY)
 
+            # Try both logout and exit commands for compatibility
             tn.write(b"logout\n")
+            time.sleep(0.5)
+            tn.write(b"exit\n")
             output = tn.read_all().decode(errors="ignore")
 
             log_file.write(f"{timestamp} {host}:{port} SUCCESS\n{output}\n\n")
