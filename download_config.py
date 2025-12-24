@@ -85,7 +85,21 @@ def handle_switch(entry, index, total):
             upload_cmd = f"upload cfg_toTFTP {TFTP_SERVER} dest_file {host}_{port}.cfg"
             print(f"{Colors.YELLOW}Executing: {upload_cmd}{Colors.RESET}")
             tn.write(upload_cmd.encode() + b"\n")
-            time.sleep(COMMAND_DELAY * 3)  # Give more time for upload
+            
+            # Wait for Success message
+            response = tn.read_until(b"Success", CONNECTION_TIMEOUT * 3)
+            if b"Success" not in response:
+                # Try alternative command without dest_file
+                print(f"{Colors.YELLOW}Retrying without dest_file...{Colors.RESET}")
+                upload_cmd_alt = f"upload cfg_toTFTP {TFTP_SERVER} {host}_{port}.cfg"
+                print(f"{Colors.YELLOW}Executing: {upload_cmd_alt}{Colors.RESET}")
+                tn.write(upload_cmd_alt.encode() + b"\n")
+                
+                response = tn.read_until(b"Success", CONNECTION_TIMEOUT * 3)
+                if b"Success" not in response:
+                    raise Exception("Upload failed - no Success message")
+            
+            print(f"{Colors.GREEN}Upload successful: {host}_{port}.cfg{Colors.RESET}")
 
             # Try both logout and exit commands for compatibility
             tn.write(b"logout\n")
