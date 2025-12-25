@@ -142,7 +142,6 @@ Upload successful: 10.2.20.6_234.cfg
 
 ## 📌 Recommendations
 
-- Don't commit real credentials to GitHub — use `credentials.example.json`
 - Multiple runs can be added to history, logging preserves previous records
 - For large networks, increase `parallel_connections`, but don't overload switches
 
