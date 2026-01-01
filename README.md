@@ -6,10 +6,10 @@ CLI script for mass command execution on switches via Telnet with support for:
 - Parallel command execution with configurable number of threads
 - Connection and command execution timeouts
 - Retry attempts on failed connections
-- Logging to separate `logs/` folder (`log.txt`, `success.txt`, `fail.txt`)
+- Logging to separate `logs/` folder with timestamp-based filenames
 - Summary at the end with execution time (ms)
 - Progress during execution
-- **NEW: TFTP configuration backup support**
+- **NEW: TFTP configuration backup support with timestamped config files**
 
 ---
 
@@ -22,7 +22,7 @@ config.json             # Configuration file
 switches.txt            # List of switches (IP or IP:PORT)
 commands.txt            # Commands to execute
 credentials.json        # Login/password
-logs/                   # Logs folder
+logs/                   # Logs folder with timestamped files
 ```
 
 ---
@@ -89,7 +89,7 @@ python run.py
 python download_config.py
 ```
 
-- Script automatically creates `logs/` folder and `log.txt`, `success.txt`, `fail.txt` files if they don't exist
+- Script automatically creates `logs/` folder and timestamped log files (e.g., `log_2026-01-01_17-03-28.txt`, `success.txt`, `fail.txt`)
 - Shows progress in terminal during execution
 - After completion shows summary:
 - Total number of switches
@@ -106,13 +106,13 @@ The `download_config.py` script automatically backs up switch configurations to 
 - Executes `upload cfg_toTFTP <tftp_server> dest_file <IP>_<PORT>.cfg`
 - Waits for "Success" confirmation from the switch
 - Falls back to alternative command format if needed
-- Files are saved on TFTP server with format: `10.2.20.5_234.cfg`
+- Files are saved on TFTP server with timestamped format: `10.2.20.5_234_2026-01-01_17-03-28.cfg`
 
 **Example output:**
 ```
 [1/4] 10.2.20.6:234 (try 1)
-Executing: upload cfg_toTFTP 10.1.11.97 dest_file 10.2.20.6_234.cfg
-Upload successful: 10.2.20.6_234.cfg
+Executing: upload cfg_toTFTP 10.1.11.97 dest_file 10.2.20.6_234_2026-01-01_17-03-28.cfg
+Upload successful: 10.2.20.6_234_2026-01-01_17-03-28.cfg
 ✓ SUCCESS 10.2.20.6:234
 ```
 
@@ -120,9 +120,10 @@ Upload successful: 10.2.20.6_234.cfg
 
 ## 📊 Logging
 
-- `logs/log.txt` — detailed logs with date, IP, port, result and command output
+- `logs/log_YYYY-MM-DD_HH-MM-SS.txt` — detailed logs with timestamp in filename, containing IP, port, result and command output
 - `logs/success.txt` — list of successful connections with run date
 - `logs/fail.txt` — list of failed connections with run date
+- Log files are created with timestamp for each script run, preserving history of all executions
 
 ---
 
@@ -136,14 +137,17 @@ Upload successful: 10.2.20.6_234.cfg
 - Summary with execution time in milliseconds
 - Modular file structure for easy editing: `switches.txt`, `commands.txt`, `credentials.json`
 - **TFTP configuration backup with automatic retry on command format variations**
-- **Backup files named by IP and port for easy identification**
+- **Backup files named with IP, port and timestamp for easy identification and version tracking**
+- **Timestamped log files preserve execution history**
 
 ---
 
 ## 📌 Recommendations
 
-- Multiple runs can be added to history, logging preserves previous records
+- Each script run creates a new timestamped log file, preserving complete execution history
+- Config backups include timestamps, allowing version tracking and recovery
 - For large networks, increase `parallel_connections`, but don't overload switches
+- Old log files can be safely archived or deleted without affecting new runs
 
 ---
 
