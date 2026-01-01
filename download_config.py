@@ -109,13 +109,10 @@ def handle_switch(entry, index, total):
             
             print(f"{Colors.GREEN}Upload successful: {config_filename}{Colors.RESET}")
 
-            # Try both logout and exit commands for compatibility
-            tn.write(b"logout\n")
-            time.sleep(0.5)
-            tn.write(b"exit\n")
-            output = tn.read_all().decode(errors="ignore")
+            # Close connection immediately after success
+            tn.close()
 
-            log_file.write(f"{timestamp} {host}:{port} SUCCESS\n{output}\n\n")
+            log_file.write(f"{timestamp} {host}:{port} SUCCESS - Config uploaded: {config_filename}\n\n")
             success_file.write(f"{host}:{port}\n")
             success_count += 1
             print(f"{Colors.GREEN}✓ SUCCESS{Colors.RESET} {host}:{port}")

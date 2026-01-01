@@ -1,6 +1,6 @@
 {
   "default_port": 23,
-  "connection_timeout": 1,
+  "connection_timeout": 3,
   "command_delay": 0.5,
   "retries": 2,
   "parallel_workers": 10,
