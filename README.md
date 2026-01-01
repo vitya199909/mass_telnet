@@ -1,4 +1,5 @@
 # Mass Telnet Command Executor
+## This software is proprietary. Unauthorized use or distribution is prohibited.
 
 CLI script for mass command execution on switches via Telnet with support for:
 
