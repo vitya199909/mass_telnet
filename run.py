@@ -87,15 +87,23 @@ def handle_switch(entry, index, total):
             tn.read_until(b"Password: ", CONNECTION_TIMEOUT)
             tn.write(PASSWORD.encode() + b"\n")
 
+            # Wait for initial prompt
+            tn.read_until(b"#", CONNECTION_TIMEOUT)
+
+            output_parts = []
             for cmd in commands:
                 tn.write(cmd.encode() + b"\n")
-                time.sleep(COMMAND_DELAY)
+                # Wait for prompt after each command to ensure it completed
+                response = tn.read_until(b"#", CONNECTION_TIMEOUT * 2)
+                output_parts.append(response.decode(errors="ignore"))
 
             # Try both logout and exit commands for compatibility
             tn.write(b"logout\n")
-            time.sleep(0.5)
             tn.write(b"exit\n")
-            output = tn.read_all().decode(errors="ignore")
+            final_output = tn.read_all().decode(errors="ignore")
+            output_parts.append(final_output)
+            
+            output = "\n".join(output_parts)
 
             log_file.write(f"{timestamp} {host}:{port} SUCCESS\n{output}\n\n")
             success_file.write(f"{host}:{port}\n")
