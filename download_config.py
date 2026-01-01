@@ -45,9 +45,11 @@ with open("switches.txt") as f:
 # ---------- LOGS ----------
 os.makedirs("logs", exist_ok=True)
 
-log_path = "logs/log.txt"
-success_path = "logs/success.txt"
-fail_path = "logs/fail.txt"
+# Create timestamp for log files
+file_timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+log_path = f"logs/log_{file_timestamp}.txt"
+success_path = f"logs/success.txt"
+fail_path = f"logs/fail.txt"
 
 log_file = open(log_path, "a")
 success_file = open(success_path, "a")
@@ -86,8 +88,9 @@ def handle_switch(entry, index, total):
             # Wait for prompt
             tn.read_until(b"#", CONNECTION_TIMEOUT)
 
-            # Upload config command with IP as TFTP server and filename
-            upload_cmd = f"upload cfg_toTFTP {TFTP_SERVER} dest_file {host}_{port}.cfg"
+            # Upload config command with IP as TFTP server and filename with timestamp
+            config_filename = f"{host}_{port}_{file_timestamp}.cfg"
+            upload_cmd = f"upload cfg_toTFTP {TFTP_SERVER} dest_file {config_filename}"
             print(f"{Colors.YELLOW}Executing: {upload_cmd}{Colors.RESET}")
             tn.write(upload_cmd.encode() + b"\n")
             
@@ -96,7 +99,7 @@ def handle_switch(entry, index, total):
             if b"Success" not in response:
                 # Try alternative command without dest_file
                 print(f"{Colors.YELLOW}Retrying without dest_file...{Colors.RESET}")
-                upload_cmd_alt = f"upload cfg_toTFTP {TFTP_SERVER} {host}_{port}.cfg"
+                upload_cmd_alt = f"upload cfg_toTFTP {TFTP_SERVER} {config_filename}"
                 print(f"{Colors.YELLOW}Executing: {upload_cmd_alt}{Colors.RESET}")
                 tn.write(upload_cmd_alt.encode() + b"\n")
                 
@@ -104,7 +107,7 @@ def handle_switch(entry, index, total):
                 if b"Success" not in response:
                     raise Exception("Upload failed - no Success message")
             
-            print(f"{Colors.GREEN}Upload successful: {host}_{port}.cfg{Colors.RESET}")
+            print(f"{Colors.GREEN}Upload successful: {config_filename}{Colors.RESET}")
 
             # Try both logout and exit commands for compatibility
             tn.write(b"logout\n")

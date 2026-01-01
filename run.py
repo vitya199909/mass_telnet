@@ -47,9 +47,11 @@ with open("commands.txt") as f:
 # ---------- LOGS ----------
 os.makedirs("logs", exist_ok=True)
 
-log_path = "logs/log.txt"
-success_path = "logs/success.txt"
-fail_path = "logs/fail.txt"
+# Create timestamp for log files
+file_timestamp = time.strftime("%Y-%m-%d_%H-%M-%S")
+log_path = f"logs/log_{file_timestamp}.txt"
+success_path = f"logs/success.txt"
+fail_path = f"logs/fail.txt"
 
 log_file = open(log_path, "a")
 success_file = open(success_path, "a")

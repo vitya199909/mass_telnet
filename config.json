@@ -1,8 +1,8 @@
 {
   "default_port": 23,
-  "connection_timeout": 10,
+  "connection_timeout": 1,
   "command_delay": 0.5,
   "retries": 2,
-  "parallel_workers": 5,
+  "parallel_workers": 10,
   "tftp_server": "10.1.11.97"
 }
