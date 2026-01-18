@@ -1,6 +1,8 @@
 # Mass Telnet Command Executor
 ## This software is proprietary. Unauthorized use or distribution is prohibited.
 
+# Script work with Python 3.10
+
 CLI script for mass command execution on switches via Telnet with support for:
 
 - Connecting to multiple ports (`IP` or `IP:PORT`)
